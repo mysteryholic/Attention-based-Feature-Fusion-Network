@@ -6,8 +6,6 @@
 멀티 모달/다중 특징을 **어텐션 기반으로 융합(attention‑based feature fusion)** 하도록
 구조를 수정하고, YOLOv5 기반 이미지 모듈을 결합한 연구용 코드베이스입니다.
 
-아래 내용은 이 프로젝트의 전체 구조, 사용 방법, 학습/평가 절차를
-한 번에 파악할 수 있도록 정리한 문서입니다.
 
 ## 1. 프로젝트 개요
 
@@ -59,7 +57,6 @@
 ## 3. 설치 (Installation)
 
 자세한 환경 및 설치 방법은 [docs/INSTALL.md](docs/INSTALL.md)를 참고하세요.
-여기서는 핵심 절차만 요약합니다.
 
 ### 3.1 기본 요구사항
 
@@ -228,7 +225,3 @@ attention fusion이 포함된 설정 파일을 확인하는 것을 권장합니�
 - 원본 프레임워크 사용법이 더 궁금하다면 아래 저장소를 함께 참고하세요.
 	- OpenPCDet: https://github.com/open-mmlab/OpenPCDet
 	- YOLOv5: https://github.com/ultralytics/yolov5
-
-이 README는 이 저장소만으로도 전체 흐름을 이해할 수 있도록
-요약한 문서이므로, 세부 명령이나 추가 팁은 docs 디렉터리의
-개별 문서를 함께 참고하는 것을 추천합니다.
