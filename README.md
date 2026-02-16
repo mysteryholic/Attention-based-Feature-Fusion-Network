@@ -2,99 +2,100 @@
 
 # Attention‑based Feature Fusion Network
 
-이 저장소는 LiDAR 기반 3D 객체 검출 프레임워크인 **OpenPCDet**를 기반으로,
-멀티 모달/다중 특징을 **어텐션 기반으로 융합(attention‑based feature fusion)** 하도록
-구조를 수정하고, YOLOv5 기반 이미지 모듈을 결합한 연구용 코드베이스입니다.
+This repository is built on top of the LiDAR‑based 3D object detection framework **OpenPCDet**.
+It modifies the original architecture to support **attention‑based feature fusion** for
+multi‑modal / multi‑feature inputs and integrates a YOLOv5‑based image module for research.
 
 
-## 1. 프로젝트 개요
+## 1. Overview
 
-- 베이스 프레임워크: OpenPCDet (LiDAR 3D Object Detection)
-- 주요 변경점
-	- `pcdet/models`, `pcdet/datasets` 구조를 일부 수정하여
-		**attention 기반 feature fusion 모듈**을 추가
-	- `tools/` 및 `yolov5/` 디렉터리를 통해 **YOLOv5 2D detector**와 연동 가능
-	- custom 데이터셋을 위한 템플릿 및 데이터 전처리 스크립트 제공
-- 지원 데이터셋
-	- KITTI, NuScenes, Waymo, Lyft, ONCE, Pandaset (OpenPCDet 기본 지원)
-	- custom dataset (docs/CUSTOM_DATASET_TUTORIAL.md 참고)
+- Base framework: OpenPCDet (LiDAR 3D Object Detection)
+- Main modifications
+	- Extend / modify `pcdet/models` and `pcdet/datasets` to add
+		**attention‑based feature fusion modules**
+	- Integrate with a **YOLOv5 2D detector** via the `tools/` and `yolov5/` directories
+	- Provide templates and preprocessing scripts for custom datasets
+- Supported datasets
+	- KITTI, NuScenes, Waymo, Lyft, ONCE, Pandaset (inherited from OpenPCDet)
+	- Custom datasets (see docs/CUSTOM_DATASET_TUTORIAL.md)
 
-이 저장소는 **OpenPCDet v0.5** 스타일의 학습/평가 파이프라인을
-그대로 유지하면서, 추가적인 attention fusion 구조를 실험할 수 있도록 구성되어 있습니다.
+This codebase keeps the **OpenPCDet v0.5** training/evaluation pipeline
+while allowing you to experiment with additional attention‑based fusion structures.
 
 ---
 
-## 2. 디렉터리 구조
+## 2. Directory Structure
 
-프로젝트 최상단 기준 주요 디렉터리는 다음과 같습니다.
+The main directories at the project root are:
 
 - `pcdet/`
-	- 3D detector의 **모델 정의, 데이터셋 정의, 데이터 증강, 후처리** 등이 포함된
-		핵심 라이브러리입니다.
-	- `datasets/`: KITTI, NuScenes, Waymo, Lyft, ONCE, Pandaset 및 custom 데이터셋 로더
-	- `models/`: 3D backbone, neck, head, detector, ROI heads, fusion 모듈 등
-	- `ops/`: spconv 기반 연산, ROI pooling, PointNet++ 등 C++/CUDA 확장 모듈
+	- Core library that contains **model definitions, dataset definitions,
+		data augmentation, post‑processing**, etc.
+	- `datasets/`: loaders for KITTI, NuScenes, Waymo, Lyft, ONCE, Pandaset and custom datasets
+	- `models/`: 3D backbones, necks, heads, detectors, ROI heads and fusion modules
+	- `ops/`: C++/CUDA extensions such as spconv‑based ops, ROI pooling, PointNet++
 - `tools/`
-	- 실험용 스크립트 및 모델 설정 파일이 위치합니다.
-	- `train.py`: 단일 GPU 학습 스크립트
-	- `test.py`: 학습된 모델 평가 및 결과 저장
-	- `demo.py`: 단일 point cloud에 대한 시각화 데모 (docs/DEMO.md 참고)
-	- `cfgs/`: 각 데이터셋/모델 조합에 대한 YAML 설정 파일
-	- `process_tools/`: 데이터베이스 생성 등 전처리 스크립트
+	- Scripts and config files used to run experiments.
+	- `train.py`: single‑GPU training script
+	- `test.py`: evaluation script for trained models
+	- `demo.py`: visualization demo for a single point cloud (see docs/DEMO.md)
+	- `cfgs/`: YAML config files for each dataset / model combination
+	- `process_tools/`: preprocessing utilities (e.g., database generation)
 - `yolov5/`
-	- YOLOv5 원본 코드가 포함되어 있으며, 2D detector로 사용해
-		3D detector와의 **feature/box level fusion** 실험에 활용할 수 있습니다.
+	- Contains the original YOLOv5 code, used as a 2D detector
+		to enable **feature / box‑level fusion** with the 3D detector.
 - `docs/`
-	- `INSTALL.md`: 의존성 설치 및 컴파일 방법
-	- `GETTING_STARTED.md`: 데이터셋 준비, 학습/평가 기본 사용법
-	- `DEMO.md`: 데모 실행 및 시각화 가이드
-	- `CUSTOM_DATASET_TUTORIAL.md`: custom 데이터셋 적용 방법
+	- `INSTALL.md`: installation and compilation guide
+	- `GETTING_STARTED.md`: dataset preparation and basic train/eval usage
+	- `DEMO.md`: demo and visualization guide
+	- `CUSTOM_DATASET_TUTORIAL.md`: how to plug in a custom dataset
 - `result*.txt`
-	- 실험 결과 로그 또는 벤치마크 성능 요약이 텍스트로 기록되어 있습니다.
+	- Text logs summarizing experiment results or benchmark scores.
 
 ---
 
-## 3. 설치 (Installation)
+## 3. Installation
 
-자세한 환경 및 설치 방법은 [docs/INSTALL.md](docs/INSTALL.md)를 참고하세요.
+For full details, please refer to [docs/INSTALL.md](docs/INSTALL.md).
 
-### 3.1 기본 요구사항
+### 3.1 Requirements
 
-- OS: Linux / macOS (Linux 기준으로 가장 많이 테스트됨)
-- Python: 3.6 이상
-- PyTorch: 1.1 이상 (1.3~1.10 권장)
-- CUDA: 9.0 이상 (PyTorch 버전에 맞춰 설치)
-- spconv: v1.0, v1.2 또는 v2.x 중 택일 (configs와 호환성 확인)
+- OS: Linux / macOS (Linux is the most thoroughly tested)
+- Python: 3.6+
+- PyTorch: 1.1+ (1.3–1.10 recommended)
+- CUDA: 9.0+ (match the version to your PyTorch install)
+- spconv: choose one of v1.0, v1.2, or v2.x (ensure config compatibility)
 
-### 3.2 설치 순서 요약
+### 3.2 Quick Setup
 
-1. 저장소 클론
+1. Clone the repository
 	 ```bash
 	 git clone https://github.com/sanghyunryoo/attention-based-feature-fusion-network.git
 	 cd attention-based-feature-fusion-network
 	 ```
-2. Python 패키지 설치
+2. Install Python dependencies
 	 ```bash
 	 pip install -r requirements.txt
 	 ```
-3. spconv 설치
-	 - 사용하는 PyTorch/CUDA 버전에 맞는 spconv 버전을 선택하여 설치합니다.
-	 - 자세한 내용은 [spconv 공식 문서](https://github.com/traveller59/spconv)를 참고하세요.
-4. pcdet 라이브러리 설치
+3. Install spconv
+	 - Install the spconv version that matches your PyTorch/CUDA stack.
+	 - See the [official spconv repo](https://github.com/traveller59/spconv) for details.
+4. Install the pcdet library
 	 ```bash
 	 python setup.py develop
 	 ```
 
-설치가 끝나면 Python에서 `import pcdet`가 정상적으로 동작해야 합니다.
+After installation, `import pcdet` in Python should work without errors.
 
 ---
 
-## 4. 데이터셋 준비
+## 4. Dataset Preparation
 
-데이터셋 준비 절차는 [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)에 상세히 정리되어 있습니다.
-여기서는 가장 많이 사용하는 KITTI 기준 예시만 요약합니다.
+The dataset preparation steps are described in detail in
+[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
+Below is a brief summary for the commonly used KITTI dataset.
 
-### 4.1 기본 구조 예시 (KITTI)
+### 4.1 Example Layout (KITTI)
 
 ```text
 attention-based-feature-fusion-network
@@ -109,72 +110,74 @@ attention-based-feature-fusion-network
 ├── tools
 ```
 
-### 4.2 데이터 info 생성
+### 4.2 Generate Data Infos
 
-KITTI 예시:
+Example for KITTI:
 
 ```bash
 python -m pcdet.datasets.kitti.kitti_dataset \
 		create_kitti_infos tools/cfgs/dataset_configs/kitti_dataset.yaml
 ```
 
-NuScenes/Waymo/ONCE/Lyft 등 다른 데이터셋도 비슷한 방식으로
-각각의 dataset 스크립트를 호출하여 info 파일을 생성합니다.
-필요한 모든 명령어는 GETTING_STARTED.md에 정리되어 있습니다.
+For NuScenes, Waymo, ONCE, Lyft and other datasets, you follow a similar pattern:
+run the corresponding dataset script to generate info files.
+All necessary commands are listed in GETTING_STARTED.md.
 
-custom 데이터셋을 사용하는 경우 [docs/CUSTOM_DATASET_TUTORIAL.md](docs/CUSTOM_DATASET_TUTORIAL.md)를 참고해
-annotation 포맷과 폴더 구조를 맞춘 뒤, 대응하는 info 생성 스크립트를 실행하면 됩니다.
+For custom datasets, see [docs/CUSTOM_DATASET_TUTORIAL.md](docs/CUSTOM_DATASET_TUTORIAL.md)
+to match the annotation format and folder structure, then run the
+corresponding info‑generation script.
 
 ---
 
-## 5. 학습 및 평가
+## 5. Training and Evaluation
 
-### 5.1 단일 GPU 학습
+### 5.1 Single‑GPU Training
 
 ```bash
 cd tools
 python train.py --cfg_file ${CONFIG_FILE}
 ```
 
-- `${CONFIG_FILE}` 예시: `cfgs/kitti_models/pv_rcnn.yaml`
-- 배치 크기, 에폭 수 등을 커스텀하려면 `--batch_size`, `--epochs` 인자를 추가합니다.
+- Example `${CONFIG_FILE}`: `cfgs/kitti_models/pv_rcnn.yaml`
+- You can override batch size and epochs with `--batch_size` and `--epochs`.
 
-### 5.2 멀티 GPU 학습
+### 5.2 Multi‑GPU Training
 
 ```bash
 cd tools
 sh scripts/dist_train.sh ${NUM_GPUS} --cfg_file ${CONFIG_FILE}
 ```
 
-SLURM 환경에서는 `scripts/slurm_train.sh`를 사용할 수 있습니다.
+On SLURM clusters, you can instead use `scripts/slurm_train.sh`.
 
-### 5.3 테스트 및 평가
+### 5.3 Testing and Evaluation
 
 ```bash
 cd tools
 python test.py --cfg_file ${CONFIG_FILE} --batch_size ${BATCH_SIZE} --ckpt ${CKPT}
 ```
 
-- `--ckpt`에는 학습된 모델의 체크포인트(`.pth`) 경로를 넣습니다.
-- `--eval_all` 옵션을 사용하면 실험 디렉터리 내 여러 체크포인트를 일괄 평가할 수 있습니다.
-- 멀티 GPU 테스트는 `scripts/dist_test.sh` 또는 SLURM 스크립트를 사용합니다.
+- `--ckpt` should point to the trained model checkpoint (`.pth`).
+- Use `--eval_all` to evaluate multiple checkpoints in the same experiment folder.
+- For multi‑GPU testing, use `scripts/dist_test.sh` or the SLURM script.
 
 ---
 
-## 6. 데모 및 시각화
+## 6. Demo and Visualization
 
-단일 point cloud에 대해 예측 결과를 확인하고 싶다면 [docs/DEMO.md](docs/DEMO.md)를 참고해
-아래와 같이 실행할 수 있습니다.
+To quickly visualize predictions on a single point cloud, see
+[docs/DEMO.md](docs/DEMO.md) and run the following.
 
-1. Open3D 또는 mayavi 설치
+1. Install Open3D or mayavi
 	 ```bash
 	 pip install open3d
-	 # 또는
+	 # or
 	 pip install mayavi
 	 ```
-2. custom point cloud를 KITTI 기준 좌표계(x: front, y: left, z: up)로 변환
-3. `numpy` 포맷 `(N, 4) = [x, y, z, intensity]` 로 저장
-4. 데모 실행
+2. Convert your custom point cloud to the KITTI coordinate system
+	 (x: front, y: left, z: up).
+3. Save it as a NumPy file with shape `(N, 4) = [x, y, z, intensity]`.
+4. Run the demo
 	 ```bash
 	 cd tools
 	 python demo.py \
@@ -183,45 +186,47 @@ python test.py --cfg_file ${CONFIG_FILE} --batch_size ${BATCH_SIZE} --ckpt ${CKP
 			 --data_path path/to/your_data.npy
 	 ```
 
-실행 후 3D point cloud와 예측 박스가 시각화된 윈도우를 확인할 수 있습니다.
+You should see a visualization window showing the 3D point cloud
+with predicted bounding boxes.
 
 ---
 
-## 7. YOLOv5 및 어텐션 기반 융합 구조 개념
+## 7. YOLOv5 and Attention‑based Fusion
 
-이 저장소에는 `yolov5/` 디렉터리가 함께 포함되어 있으며,
-2D detector로부터 얻은 정보(예: 2D bounding box, feature map)를
-LiDAR 기반 3D detector와 융합하는 구조를 실험할 수 있습니다.
+This repository includes a `yolov5/` directory and supports
+experiments where information from a 2D detector (e.g., 2D bounding boxes,
+feature maps) is fused with a LiDAR‑based 3D detector.
 
-일반적인 흐름은 다음과 같습니다.
+A typical pipeline is as follows:
 
-1. YOLOv5로 이미지에서 2D detection 수행
-2. 각 2D box / feature를 LiDAR 뷰와 정렬 (calibration 사용)
-3. `pcdet/models` 내 fusion 모듈에서 **attention 메커니즘**을 이용해
-	 - LiDAR feature와 image feature의 중요도를 동적으로 계산
-	 - 두 특징을 가중합 또는 concat 후 projection 하는 방식으로 융합
-4. 최종 3D detection head에서 3D bounding box 및 class score 예측
+1. Run YOLOv5 to obtain 2D detections on images.
+2. Align each 2D box / feature with the LiDAR view using calibration.
+3. In the fusion modules under `pcdet/models`, use an **attention mechanism** to
+	 - dynamically weight LiDAR vs. image features;
+	 - fuse them via weighted sum or concatenation followed by a projection.
+4. The final 3D detection head predicts 3D bounding boxes and class scores.
 
-구체적인 구현 위치와 사용 방법은 각자의 실험 코드/브랜치에 따라 조금씩 다를 수 있으므로,
-`pcdet/models`, `tools/cfgs/custom_models` 등을 참고하여
-attention fusion이 포함된 설정 파일을 확인하는 것을 권장합니다.
-
----
-
-## 8. 자주 보는 파일 정리
-
-- 전체 설정/하이퍼파라미터: `tools/cfgs/**.yaml`
-- 학습/평가 스크립트: `tools/train.py`, `tools/test.py`
-- 데이터셋 정의: `pcdet/datasets/`
-- 모델 및 fusion 모듈: `pcdet/models/`
-- 시각화/데모: `tools/demo.py`, `visual_utils/`
+The exact implementation details and configs may vary per experiment or branch.
+Check `pcdet/models` and any custom configs under `tools/cfgs` to see
+which models include attention‑based fusion.
 
 ---
 
-## 9. 참고
+## 8. Frequently Used Files
 
-- 본 프로젝트는 OpenPCDet와 YOLOv5의 구조/코드를 기반으로 하며,
-	attention 기반 feature fusion 구조를 연구/실험하기 위해 구성되었습니다.
-- 원본 프레임워크 사용법이 더 궁금하다면 아래 저장소를 함께 참고하세요.
+- Overall configs / hyperparameters: `tools/cfgs/**.yaml`
+- Training / evaluation scripts: `tools/train.py`, `tools/test.py`
+- Dataset definitions: `pcdet/datasets/`
+- Models and fusion modules: `pcdet/models/`
+- Visualization / demo: `tools/demo.py`, `visual_utils/`
+
+---
+
+## 9. Notes
+
+- This project is based on the code and structure of
+	OpenPCDet and YOLOv5, and is designed for research and experiments
+	on attention‑based feature fusion.
+- For more details on the original frameworks, please refer to:
 	- OpenPCDet: https://github.com/open-mmlab/OpenPCDet
 	- YOLOv5: https://github.com/ultralytics/yolov5
